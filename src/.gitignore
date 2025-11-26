@@ -1,0 +1,16 @@
+
+# Media files
+media/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+.env
+# Django
+db.sqlite3
+media/downloads/
+test_ffmpeg.py

@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#163e5d',
+                        secondary: '#6c757d',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Open graph -->
+    <meta property="og:title" content="Téléchargeur de médias sociaux" />
+    <meta property="og:description"
+        content="Téléchargez des vidéos, audios et images depuis vos plateformes préférées." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://qrcode.mouhatech.com/" />
+    <meta property="og:site_name" content="Générateur de QR Code" />
+
+
+    <!-- Select2 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet" />
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Select2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
+
+    <link rel="icon" type="image/png" href="{% static 'charge/images/downoad_logo.png' %}">
+    <link rel="stylesheet" href=" {% static 'charge/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'charge/css/select.css' %}">
+    <title>Téléchargeur de médias sociaux</title>
+</head>
+
+<body class="flex items-center justify-center p-4">
+    <div class="w-full max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8 fade-in">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-2 drop-shadow-lg">
+                Téléchargeur de médias sociaux
+            </h1>
+            <p class="text-white/90 text-lg">Téléchargez instantanément et gratuitement depuis tous les médias sociaux.
+            </p>
+        </div>
+
+        <!-- carte principale -->
+        <div class="glass-effect rounded-2xl px-6 py-4 md:px-8 md:py-5 shadow-2xl fade-in">
+            <form method="post" id="downloadForm" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                <!-- Input Section -->
+                <div class="space-y-4">
+                    <div>
+                        <label for="url" class="block text-gray-700 font-semibold mb-2 text-lg">Entrez l'URL du média</label>
+                        <div class="relative">
+                            {{ form.url }}
+                            <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="type" class="block text-gray-700 font-semibold mb-2">Type de média</label>
+                            {{ form.media_type }}
+                        </div>
+                        <div>
+                            <label for="quality" class="block text-gray-700 font-semibold mb-2">Qualité</label>
+                            {{ form.quality }}
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- bouton generate -->
+                <button type="submit" id="downloadBtn"
+                    class="w-full py-3 px-6 rounded-xl text-white font-semibold text-lg shadow-lg"
+                    style="background: linear-gradient(135deg, #163e5d 0%, #163e5d 100%);">
+                    <span class="flex items-center justify-center gap-2">
+                        <i data-lucide="rocket" class="w-5 h-5"></i>
+                        Lancer le téléchargement
+                    </span>
+                </button>
+            </form>
+
+            <!-- messages serveur -->
+            <div id="result" class="mt-8">
+                {% if message %}
+                <div class="p-4 rounded-xl bg-gray-50 border-2 border-gray-200 text-gray-700">{{ message }}</div>
+                {% endif %}
+                {% if download_url %}
+                <div class="flex gap-3 flex-wrap justify-center mt-4">
+                    <button type="button" id="finalDownloadBtnStatic"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V3"></path>
+                        </svg>
+                        Télécharger
+                    </button>
+                    <button type="button" id="resetBtn"
+                        class="inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                            </path>
+                        </svg>
+                        Réinitialiser
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-20 text-white/80 text-sm">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p>Téléchargeur de médias sociaux — simple et gratuit</p>
+                <p>Developpé avec 🤍 par <a href="https://mouhatech.com" target="_blank"><span ="text-white font-bold">MouhaTech</span></a></p>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+    <script src="{% static 'charge/js/script.js' %}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,185 @@
+/* Select2 — look Tailwind-like */
+
+.select2-container .select2-selection--single {
+    height: 44px;
+    border: none;
+    /* remove extra outer border */
+    border-radius: 0.75rem;
+    /* rounded-xl */
+    display: flex;
+    align-items: center;
+    transition: box-shadow .2s, border-color .2s;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #374151;
+    /* gray-700 */
+    line-height: 44px;
+    padding-left: 12px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 44px;
+    right: 10px;
+}
+
+.select2-container--default.select2-container--open .select2-selection--single,
+.select2-container--default .select2-selection--single:focus {
+    border-color: #163e5d;
+    /* primary */
+    box-shadow: none;
+    /* remove glow ring to avoid double border */
+}
+
+.select2-dropdown {
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.select2-results__option--selected {
+    background-color: #e5e7eb !important;
+}
+
+.select2-results__option--highlighted.select2-results__option--selectable {
+    background: #163e5d !important;
+    color: #fff !important;
+}
+
+.select2-search--dropdown .select2-search__field {
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+}
+
+.select2-container--default .select2-selection--single {
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    /* border-gray-300 */
+    border-radius: 0.75rem !important;
+    /* rounded-xl */
+    height: 43px !important;
+    /* h-12 */
+    padding-left: 0.75rem !important;
+    /* pl-3 */
+    display: flex !important;
+    align-items: center !important;
+    transition: all 0.3s ease;
+    /* transition-all duration-300 */
+    outline: none;
+    /* prevent default outline that looks like a second border */
+}
+
+/* Focus (équivalent Tailwind: border-primary / ring-primary) */
+.select2-container--default.select2-container--focus .select2-selection--single {
+    border: 2px solid #163e5d;
+    /* bleu */
+}
+
+/* Texte sélectionné */
+.select2-container--default .select2-selection__rendered {
+    color: #374151;
+    /* text-gray-700 */
+    font-size: 0.95rem;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Placeholder */
+.select2-container--default .select2-selection__placeholder {
+    color: #9ca3af;
+    /* text-gray-400 */
+}
+
+/* Flèche dropdown */
+.select2-container--default .select2-selection__arrow {
+    top: 50% !important;
+    right: 0.75rem !important;
+    /* right-3 */
+    transform: translateY(-50%);
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.select2-container--default .select2-selection__arrow b {
+    border-color: #6b7280 transparent transparent transparent;
+    /* gray-500 */
+    border-width: 6px 6px 0 6px;
+}
+
+/* ============================
+   SEARCH INPUT
+   ============================ */
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1px solid #d1d5db;
+    /* gray-300 */
+    border-radius: 0.5rem;
+    /* rounded-xl */
+    padding: 0.4rem 1rem;
+    /* px-3 py-2 */
+    font-size: 0.9rem;
+    transition: border 0.3s ease;
+    outline: none;
+    color: #374151;
+    z-index: +999;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field:focus {
+    border: 2px solid #163e5d;
+    /* violet */
+}
+
+/* ============================
+   DROPDOWN LIST
+   ============================ */
+
+.select2-dropdown {
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    /* gray-300 */
+    border-radius: 0.4rem;
+    /* rounded-2xl */
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+    /* shadow-lg */
+    margin-top: 4px;
+}
+
+.select2-results__option {
+    padding: 0.30rem 1rem;
+    /* px-4 py-3 */
+    font-size: 0.9rem;
+    color: #374151;
+    /* gray-700 */
+    border-bottom: 1px solid #f3f4f6;
+    /* gray-100 */
+}
+
+.select2-results__option:last-child {
+    border-bottom: none;
+}
+
+/* Surbrillance */
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background: #163e5d !important;
+    /* violet */
+    color: #ffffff !important;
+}
+
+/* Scrollbar */
+.select2-results__options::-webkit-scrollbar {
+    width: 7px;
+}
+
+.select2-results__options::-webkit-scrollbar-track {
+    background: #e5e7eb;
+    /* gray-200 */
+    border-radius: 1rem;
+}
+
+.select2-results__options::-webkit-scrollbar-thumb {
+    background-color: #163e5d;
+    /* violet */
+    border-radius: 1rem;
+}

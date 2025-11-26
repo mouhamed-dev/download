@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpRequest
 from django.conf import settings
 from django.http import FileResponse, Http404
+from django.core.cache import cache
 from .forms import MediaDownloadForm
 import yt_dlp
 import os
@@ -12,9 +13,11 @@ from urllib.request import urlretrieve, Request, urlopen
 import zipfile
 import re
 
-# Mémoire simple pour le suivi des tâches (OK pour un mini-projet)
-TASKS = {}
+# Stockage des tâches dans le cache partagé (compatible multi-process)
 TASKS_LOCK = threading.Lock()
+
+def _task_key(task_id: str) -> str:
+    return f"task:{task_id}"
 
 
 def index(request: HttpRequest):
@@ -84,14 +87,18 @@ def _run_download(task_id: str, url: str, media_type: str, quality: str):
             downloaded = d.get('downloaded_bytes') or 0
             pct = int(downloaded * 100 / total) if total else 0
             with TASKS_LOCK:
-                TASKS[task_id].update({
+                data = cache.get(_task_key(task_id)) or {}
+                data.update({
                     'status': 'downloading',
                     'progress': pct,
                     'speed': d.get('speed'),
                 })
+                cache.set(_task_key(task_id), data, timeout=60*60)
         elif d.get('status') == 'finished':
             with TASKS_LOCK:
-                TASKS[task_id].update({'status': 'processing', 'progress': 95})
+                data = cache.get(_task_key(task_id)) or {}
+                data.update({'status': 'processing', 'progress': 95})
+                cache.set(_task_key(task_id), data, timeout=60*60)
 
     try:
         # Cas miniature uniquement (images natives non supportées)
@@ -112,7 +119,8 @@ def _run_download(task_id: str, url: str, media_type: str, quality: str):
                 urlretrieve(thumb_url, out_path)
                 rel_path = os.path.relpath(out_path, settings.MEDIA_ROOT).replace('\\', '/')
                 with TASKS_LOCK:
-                    TASKS[task_id].update({
+                    data = cache.get(_task_key(task_id)) or {}
+                    data.update({
                         'status': 'finished',
                         'progress': 100,
                         'file_path': out_path,
@@ -120,10 +128,13 @@ def _run_download(task_id: str, url: str, media_type: str, quality: str):
                         'download_url': settings.MEDIA_URL + rel_path,
                         'message': 'Images non supportées. Miniature téléchargée.'
                     })
+                    cache.set(_task_key(task_id), data, timeout=60*60)
                 return
             except Exception as e:
                 with TASKS_LOCK:
-                    TASKS[task_id].update({'status': 'error', 'error': 'Images non supportées. Miniature uniquement.', 'details': str(e)})
+                    data = cache.get(_task_key(task_id)) or {}
+                    data.update({'status': 'error', 'error': 'Images non supportées. Miniature uniquement.', 'details': str(e)})
+                    cache.set(_task_key(task_id), data, timeout=60*60)
                 return
 
         # Vidéo/Audio via yt-dlp
@@ -265,16 +276,20 @@ def _run_download(task_id: str, url: str, media_type: str, quality: str):
 
         rel_path = os.path.relpath(out_file, settings.MEDIA_ROOT).replace('\\', '/')
         with TASKS_LOCK:
-            TASKS[task_id].update({
+            data = cache.get(_task_key(task_id)) or {}
+            data.update({
                 'status': 'finished',
                 'progress': 100,
                 'file_path': out_file,
                 'filename': os.path.basename(out_file),
                 'download_url': settings.MEDIA_URL + rel_path,
             })
+            cache.set(_task_key(task_id), data, timeout=60*60)
     except Exception as e:
         with TASKS_LOCK:
-            TASKS[task_id].update({'status': 'error', 'error': str(e)})
+            data = cache.get(_task_key(task_id)) or {}
+            data.update({'status': 'error', 'error': str(e)})
+            cache.set(_task_key(task_id), data, timeout=60*60)
 
 
 def start_download(request: HttpRequest):
@@ -297,7 +312,7 @@ def start_download(request: HttpRequest):
 
     task_id = uuid.uuid4().hex
     with TASKS_LOCK:
-        TASKS[task_id] = {'status': 'queued', 'progress': 0}
+        cache.set(_task_key(task_id), {'status': 'queued', 'progress': 0}, timeout=60*60)
 
     t = threading.Thread(target=_run_download, args=(task_id, url, media_type, quality), daemon=True)
     t.start()
@@ -306,7 +321,7 @@ def start_download(request: HttpRequest):
 
 def progress(request: HttpRequest, task_id: str):
     with TASKS_LOCK:
-        data = TASKS.get(task_id)
+        data = cache.get(_task_key(task_id))
     if not data:
         return JsonResponse({'error': 'Tâche introuvable'}, status=404)
     return JsonResponse(data)
@@ -314,7 +329,7 @@ def progress(request: HttpRequest, task_id: str):
 
 def download_file(request: HttpRequest, task_id: str):
     with TASKS_LOCK:
-        data = TASKS.get(task_id)
+        data = cache.get(_task_key(task_id))
     if not data or data.get('status') != 'finished':
         raise Http404('Fichier non prêt')
     file_path = data.get('file_path')

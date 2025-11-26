@@ -109,6 +109,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Caching (shared across processes)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': str(BASE_DIR / 'cache'),
+        'TIMEOUT': 60 * 60 * 24,  # 1 day
+        'OPTIONS': {
+            'MAX_ENTRIES': 10000,
+        },
+    }
+}
+
 # Optional local FFmpeg location (your binaries are under BASE_DIR/download/ffmpeg/bin)
 FFMPEG_LOCATION = BASE_DIR / 'download' / 'ffmpeg' / 'bin'
 

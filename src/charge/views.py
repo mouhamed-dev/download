@@ -156,27 +156,40 @@ def _run_download(task_id: str, url: str, media_type: str, quality: str):
                 'download': 2,
             },
         }
-        # FFmpeg local: pointer explicitement vers les .exe et renforcer PATH/env
+        # FFmpeg: pointer vers le binaire/dossier fourni OU autodétecter via PATH
         ffmpeg_loc = getattr(settings, 'FFMPEG_LOCATION', None)
-        if ffmpeg_loc:
-            bin_dir = str(ffmpeg_loc)
-            # Si on a fourni directement un exécutable, prendre son dossier
-            if bin_dir.lower().endswith('ffmpeg.exe'):
+        ffmpeg_path = None
+        if not ffmpeg_loc:
+            try:
+                from shutil import which
+                ffmpeg_path = which('ffmpeg')
+            except Exception:
+                ffmpeg_path = None
+        else:
+            ffmpeg_path = str(ffmpeg_loc)
+
+        if ffmpeg_path:
+            # ffmpeg_path peut être un fichier exécutable ou un dossier contenant ffmpeg
+            bin_dir = ffmpeg_path
+            if os.path.isfile(bin_dir):
+                # exécutable direct: prendre le dossier
                 bin_dir = os.path.dirname(bin_dir)
-            ffmpeg_exe = os.path.join(bin_dir, 'ffmpeg.exe')
-            ffprobe_exe = os.path.join(bin_dir, 'ffprobe.exe')
-            # Utiliser le binaire ffmpeg explicitement
-            if os.path.isfile(ffmpeg_exe):
-                ydl_opts['ffmpeg_location'] = ffmpeg_exe
+                ydl_opts['ffmpeg_location'] = ffmpeg_path
             else:
-                ydl_opts['ffmpeg_location'] = bin_dir
-            # PATH + variables env pour certains environnements
+                # dossier: essayer d'identifier le binaire (linux/mac/windows)
+                ffmpeg_exe = os.path.join(bin_dir, 'ffmpeg')
+                ffprobe_exe = os.path.join(bin_dir, 'ffprobe')
+                if os.name == 'nt':
+                    ffmpeg_exe += '.exe'
+                    ffprobe_exe += '.exe'
+                if os.path.isfile(ffmpeg_exe):
+                    ydl_opts['ffmpeg_location'] = ffmpeg_exe
+                else:
+                    # certains environnements acceptent le dossier directement
+                    ydl_opts['ffmpeg_location'] = bin_dir
+            # Étendre PATH pour les sous-process
             try:
                 os.environ['PATH'] = bin_dir + os.pathsep + os.environ.get('PATH', '')
-                if os.path.isfile(ffmpeg_exe):
-                    os.environ['FFMPEG_BINARY'] = ffmpeg_exe
-                if os.path.isfile(ffprobe_exe):
-                    os.environ['FFPROBE_BINARY'] = ffprobe_exe
             except Exception:
                 pass
         if media_type == 'audio':

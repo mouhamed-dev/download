@@ -121,8 +121,15 @@ CACHES = {
     }
 }
 
-# Optional local FFmpeg location (your binaries are under BASE_DIR/download/ffmpeg/bin)
-FFMPEG_LOCATION = BASE_DIR / 'download' / 'ffmpeg' / 'bin'
+# Optional FFmpeg location
+# In production, set FFMPEG_LOCATION in .env to the full path of ffmpeg or its bin directory.
+# If not set, yt-dlp will try to use ffmpeg found in the system PATH.
+_ffmpeg_env = env('FFMPEG_LOCATION', default=None)
+if _ffmpeg_env:
+    FFMPEG_LOCATION = Path(_ffmpeg_env)
+else:
+    _bundled = BASE_DIR / 'download' / 'ffmpeg' / 'bin'
+    FFMPEG_LOCATION = _bundled if _bundled.exists() else None
 
 # Optional yt-dlp hardening settings
 YTDLP_USER_AGENT = (

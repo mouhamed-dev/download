@@ -1,0 +1,17 @@
+# Environnement virtuel
+env/
+venv/
+
+# Base de données locale
+db.sqlite3
+
+# Python cache
+*.pyc
+__pycache__/
+
+# Cache Django
+cache/
+staticfiles/
+media/
+.env
+charge/.gitignore

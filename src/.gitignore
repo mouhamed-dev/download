@@ -14,3 +14,8 @@ env/
 db.sqlite3
 media/downloads/
 test_ffmpeg.py
+cache/
+download/cookies/cookies_tiktok.txt
+env/
+staticfiles/
+ download/cookies/cookies_youtube.txt

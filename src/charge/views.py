@@ -250,6 +250,8 @@ def _run_download(task_id: str, url: str, media_type: str, quality: str):
             ydl_opts.setdefault('extractor_args', {})
             ydl_opts['extractor_args'].setdefault('youtube', {})
             ydl_opts['extractor_args']['youtube']['player_client'] = ['default', 'android', 'web']
+            # Réduire certains cas SABR/PO token côté YouTube (sans casser l'existant)
+            ydl_opts['extractor_args']['youtube'].setdefault('po_token', ['guide'])
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             # Pre-extract to get id
@@ -296,12 +298,24 @@ def _run_download(task_id: str, url: str, media_type: str, quality: str):
                 'file_path': out_file,
                 'filename': os.path.basename(out_file),
                 'download_url': settings.MEDIA_URL + rel_path,
+                'debug': {
+                    'host': host,
+                    'cookie_used': platform_cookie,
+                    'ffmpeg_used': ydl_opts.get('ffmpeg_location'),
+                    'ua_used': ua,
+                }
             })
             cache.set(_task_key(task_id), data, timeout=60*60)
     except Exception as e:
         with TASKS_LOCK:
             data = cache.get(_task_key(task_id)) or {}
-            data.update({'status': 'error', 'error': str(e)})
+            # Ajouter un peu de contexte debug sans exposer trop d'infos
+            data.update({'status': 'error', 'error': str(e), 'debug': {
+                'host': locals().get('host', None),
+                'cookie_used': locals().get('platform_cookie', None),
+                'ffmpeg_used': locals().get('ydl_opts', {}).get('ffmpeg_location') if 'ydl_opts' in locals() else None,
+                'ua_used': locals().get('ua', None),
+            }})
             cache.set(_task_key(task_id), data, timeout=60*60)
 
 

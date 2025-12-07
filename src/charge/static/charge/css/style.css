@@ -5,6 +5,11 @@ body {
     color: #163e5d;
 }
 
+::selection {
+    background-color: #163e5d;
+    color: #ffffff;
+}
+
 .glass-effect {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);

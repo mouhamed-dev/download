@@ -79,14 +79,9 @@
 
                     <script>
                         async function pasteFromClipboard() {
-                            try {
                                 const text = await navigator.clipboard.readText();
                                 document.getElementById("url").value = text;
-                            } catch (error) {
-                                alert("Impossible de lire le presse-papier. Autorisez l'accès.");
-                                console.error(error);
                             }
-                        }
                     </script>
 
                     <div class="grid grid-cols-2 gap-4">

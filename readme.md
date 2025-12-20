@@ -177,11 +177,14 @@ Certaines plateformes limitent les téléchargements non authentifiés.
 
 ## Licence
 
-[À définir - MIT, GPL, etc.]
+Ce projet est distribué sous licence MIT.  
+Vous êtes libre de l’utiliser, le modifier et le redistribuer.  
+Voir le fichier [LICENSE](Licence) pour plus de détails.
 
 ## Contribution
 
-Les contributions sont les bienvenues ! Veuillez créer une issue ou une pull request.
+Les contributions sont les bienvenues !  
+N’hésitez pas à ouvrir une issue pour signaler un problème ou à proposer une pull request pour des améliorations.
 
 ## Support
 

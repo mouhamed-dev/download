@@ -13,7 +13,7 @@ from urllib.request import urlretrieve, Request, urlopen
 import zipfile
 import re
 
-# Stockage des tâches dans le cache partagé (compatible multi-process)
+# Stockage des tâches dans le cache partagé
 TASKS_LOCK = threading.Lock()
 
 def _task_key(task_id: str) -> str:
@@ -28,7 +28,7 @@ def index(request: HttpRequest):
 def _sanitize_filename(name: str, max_len: int = 80) -> str:
     if not name:
         return "media"
-    # Remove forbidden characters for Windows and trim
+    
     name = re.sub(r'[<>:"/\\|?*]+', ' ', name)
     name = re.sub(r'\s+', ' ', name).strip()
     if len(name) > max_len:
@@ -39,16 +39,20 @@ def _sanitize_filename(name: str, max_len: int = 80) -> str:
 def _allowed_platform(url: str) -> bool:
     netloc = urlparse(url).netloc.lower()
     allowed_hosts = (
+        # YouTube
         "youtube.com",
         "www.youtube.com",
         "youtu.be",
         "m.youtube.com",
+        # Facebook
         "facebook.com",
         "www.facebook.com",
         "fb.watch",
+        # Instagram
         "instagram.com",
         "www.instagram.com",
         "m.instagram.com",
+        # TikTok
         "tiktok.com",
         "www.tiktok.com",
         "vm.tiktok.com",
@@ -101,7 +105,7 @@ def _run_download(task_id: str, url: str, media_type: str, quality: str):
                 cache.set(_task_key(task_id), data, timeout=60*60)
 
     try:
-        # Cas miniature uniquement (images natives non supportées)
+        # Miniature uniquement (images natives non supportées (à venir?))
         if media_type in ('image', 'miniature'):
             try:
                 with yt_dlp.YoutubeDL({'quiet': True, 'skip_download': True}) as ydl:
@@ -109,7 +113,7 @@ def _run_download(task_id: str, url: str, media_type: str, quality: str):
                 thumb_url = info.get('thumbnail')
                 if not thumb_url:
                     raise Exception("Miniature indisponible pour cette URL")
-                # Build readable filename: 'miniature [id6].ext'
+                
                 label = 'miniature'
                 vid = (info.get('id') or task_id)[:6]
                 ext = os.path.splitext(thumb_url.split('?')[0])[1] or '.jpg'
@@ -140,7 +144,7 @@ def _run_download(task_id: str, url: str, media_type: str, quality: str):
         # Vidéo/Audio via yt-dlp
         ydl_opts = {
             'noplaylist': True,
-            # Use id-only filename then rename to 'video|audio [id6].ext' after download
+            
             'outtmpl': os.path.join(output_root, "%(id)s.%(ext)s"),
             'progress_hooks': [progress_hook],
             'format': _format_for(media_type, quality),
@@ -169,14 +173,14 @@ def _run_download(task_id: str, url: str, media_type: str, quality: str):
             ffmpeg_path = str(ffmpeg_loc)
 
         if ffmpeg_path:
-            # ffmpeg_path peut être un fichier exécutable ou un dossier contenant ffmpeg
+            # ffmpeg_path, fichier exécutable ou dossier contenant ffmpeg
             bin_dir = ffmpeg_path
             if os.path.isfile(bin_dir):
-                # exécutable direct: prendre le dossier
+                # fichier: prendre le dossier parent
                 bin_dir = os.path.dirname(bin_dir)
                 ydl_opts['ffmpeg_location'] = ffmpeg_path
             else:
-                # dossier: essayer d'identifier le binaire (linux/mac/windows)
+                # dossier: identifier le binaire (linux/mac/windows)
                 ffmpeg_exe = os.path.join(bin_dir, 'ffmpeg')
                 ffprobe_exe = os.path.join(bin_dir, 'ffprobe')
                 if os.name == 'nt':
@@ -185,7 +189,7 @@ def _run_download(task_id: str, url: str, media_type: str, quality: str):
                 if os.path.isfile(ffmpeg_exe):
                     ydl_opts['ffmpeg_location'] = ffmpeg_exe
                 else:
-                    # certains environnements acceptent le dossier directement
+                    
                     ydl_opts['ffmpeg_location'] = bin_dir
             # Étendre PATH pour les sous-process
             try:
@@ -199,10 +203,10 @@ def _run_download(task_id: str, url: str, media_type: str, quality: str):
                 'preferredquality': '192',
             }]
 
-        # Déterminer l'hôte cible une seule fois
+
         host = urlparse(url).netloc.lower()
 
-        # En-têtes HTTP (user-agent) et cookies optionnels
+        # (user-agent) et cookies
         ua = getattr(settings, 'YTDLP_USER_AGENT', None)
         if ua:
             ydl_opts['http_headers'] = {

@@ -191,3 +191,23 @@ N’hésitez pas à ouvrir une issue pour signaler un problème ou à proposer u
 ## Support
 
 Pour les problèmes ou questions, créez une issue sur le dépôt GitHub.
+
+## Soutenez le créateur ☕
+
+Si ce dépôt vous a été utile, vous pouvez me soutenir avec un café afin de m’aider à couvrir les frais d’hébergement et à continuer à les améliorer.
+
+<p align="center">
+  <a href="TON_LIEN_DE_PAIEMENT" target="_blank"
+     style="
+       display:inline-block;
+       padding:10px 18px;
+       background:#791f87;
+       color:white;
+       text-decoration:none;
+       border-radius:999px;
+       font-weight:600;
+       font-family:Arial, sans-serif;
+     ">
+    ☕ Offrir un café !
+  </a>
+</p>

@@ -1,10 +1,12 @@
 # Téléchargeur de Médias - MouhaTech
 
-Une application web Django pour télécharger des vidéos, audios et miniatures depuis les plateformes de médias sociaux populaires.
+![Couverture du projet](src/charge/static/charge/images/work.jpg)
+
+Download.MouhaTech est une application web Django pour télécharger des vidéos, audios et miniatures depuis les plateformes de médias sociaux populaires.
 
 ## Description
 
-Cette application permet aux utilisateurs de télécharger du contenu multimédia (vidéos, audios, miniatures) depuis diverses plateformes sociales en utilisant yt-dlp comme moteur de téléchargement principal. L'application offre une interface web simple avec suivi de progression en temps réel.
+Cette application permet aux utilisateurs de télécharger du contenu multimédia (vidéos, audios, miniatures) depuis diverses plateformes sociales en utilisant yt-dlp comme moteur de téléchargement principal et ffmpeg pour la conversion des fichiers. L'application offre une interface web simple avec suivi de progression en temps réel.
 
 ## Fonctionnalités
 

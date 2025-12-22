@@ -197,17 +197,7 @@ Pour les problèmes ou questions, créez une issue sur le dépôt GitHub.
 Si ce dépôt vous a été utile, vous pouvez me soutenir avec un café afin de m’aider à couvrir les frais d’hébergement et à continuer à les améliorer.
 
 <p align="center">
-  <a href="TON_LIEN_DE_PAIEMENT" target="_blank"
-     style="
-       display:inline-block;
-       padding:10px 18px;
-       background:#791f87;
-       color:white;
-       text-decoration:none;
-       border-radius:999px;
-       font-weight:600;
-       font-family:Arial, sans-serif;
-     ">
-    ☕ Offrir un café !
+  <a href="https://my.moneyfusion.net/694717a3e075f7af6c1695f9" target="_blank">
+    <img src="https://img.shields.io/badge/☕%20Offrir%20un%20café-791f87?style=for-the-badge" />
   </a>
 </p>

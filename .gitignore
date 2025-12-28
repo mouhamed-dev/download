@@ -15,3 +15,6 @@ staticfiles/
 media/
 .env
 charge/.gitignore
+
+# Fichiers cookies
+cookies/*.txt
